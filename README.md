@@ -8,7 +8,8 @@ This repository contains code to run analysis for deep mutational scanning proje
 1.  [Introduction and Overview](#introduction-and-overview)
 2.  [Software Requirements and Dependencies](#software-requirements-and-dependencies)
 3.  [Installation](#installation)
-4.  [General Usage](#general-usage)
+4.  [General Usage](#general-usage)  
+
         * script: [plot_mutational_frequency_and_qc_stats.py](https://github.com/tbrunetti/CHIKV_DMS/wiki/DMS_plots)  
   
 
@@ -24,10 +25,10 @@ The repository contains code for analyzing deep mutational scanning projects, pa
 For script `plot_mutational_frequency_and_qc_stats.py`:  
 
 * [python >= v3.9](https://www.python.org/downloads/)  
-* [pandas] (https://pandas.pydata.org/docs/getting_started/install.html#installing-from-pypi)  
-* [numpy] (https://numpy.org/install/)  
-* [matplotlib] (https://matplotlib.org/stable/users/installing/index.html#installation)
-* [logomaker] (https://pypi.org/project/logomaker/) 
+* [pandas](https://pandas.pydata.org/docs/getting_started/install.html#installing-from-pypi)  
+* [numpy](https://numpy.org/install/)  
+* [matplotlib](https://matplotlib.org/stable/users/installing/index.html#installation)
+* [logomaker](https://pypi.org/project/logomaker/) 
 
 
 ### Installation
