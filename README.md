@@ -10,7 +10,7 @@ This repository contains code to run analysis for deep mutational scanning proje
 3.  [Installation](#installation)
 4.  [General Usage](#general-usage)  
 
-        * script: [plot_mutational_frequency_and_qc_stats.py](https://github.com/tbrunetti/CHIKV_DMS/wiki/DMS_plots)  
+* script: [plot_mutational_frequency_and_qc_stats.py](https://github.com/tbrunetti/CHIKV_DMS/wiki/DMS_plots)  
   
 
 
