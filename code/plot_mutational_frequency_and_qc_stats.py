@@ -693,12 +693,9 @@ def get_combined_mutational_frequencies_stacked_barplot(df_hash: dict, nonsynOnl
     '''    
 
 
-def get_aa_diversity(df_hash : dict, outdir : str) -> None:
+def get_aa_diversity(df_hash : dict, outdir : str, colors : dict) -> None:
     import matplotlib.pyplot as plt
     
-    colors = {}
-    colors['mutant'] = "#CC79A7"
-    colors['wildtype'] = 'teal'
     
     combined_fig, axs = plt.subplots(1, 1,figsize=(20,7))
     combined_fig.suptitle('Amino acid diversity per codon position', fontweight = 'bold', fontsize=30)
@@ -866,10 +863,11 @@ if __name__ == '__main__':
     parser.add_argument('--includeStop', action = 'store_true', help='If setting this flag, include STOP codons')
     parser.add_argument('--annotate', action = 'store_true', help='DO NOT SET THIS -- experimental and needs testing')
     parser.add_argument('--outdir', default = os.getcwd(), help = "Path to output directory to write plots")
+    parser.add_argument('--colors', type = str, help = 'comma-separated list of hex values in the same order as --samplename')
     args = parser.parse_args()
     
     df_hash = {} # dict to store each samples data as a panda df
-    
+    colors = {} # dict to store each sample's colors
     
     # Below commment block should be replaced with for loop at bottom
     # TO DO: TESTING REQUIRED!!
@@ -901,6 +899,11 @@ if __name__ == '__main__':
     else:
         os.mkdir(args.outdir)
     
+
+    colorKeys = args.samplename.split(',')
+    colorValues = args.colors.split(',')
+    colors = dict(zip(colorKeys, colorValues))
+    
     
     for index,samples in enumerate(args.data):
         sample_df = pandas.read_csv(samples, sep = '\t')
@@ -915,5 +918,5 @@ if __name__ == '__main__':
     get_per_codon_aa_mutational_information_logoplot(df_hash = df_hash, nonsynOnly = args.nonSynOnly, outdir = args.outdir)
     get_coverage_per_codon(df_hash = df_hash, outdir = args.outdir)
     get_combined_mutational_frequencies_stacked_barplot(df_hash = df_hash, nonsynOnly = args.nonSynOnly, includeStop = args.includeStop, outdir = args.outdir)
-    get_aa_diversity(df_hash = df_hash, outdir = args.outdir)
+    get_aa_diversity(df_hash = df_hash, colors = colors, outdir = args.outdir)
     get_per_codon_aa_mutational_freq_logoplot(df_hash = df_hash, nonsynOnly = args.nonSynOnly, includeStop = args.includeStop, annot = args.annotate, outdir = args.outdir)
