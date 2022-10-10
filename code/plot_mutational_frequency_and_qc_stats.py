@@ -51,10 +51,7 @@ def filter(df: pandas.DataFrame, minQ: float, minAlt: int, codonRange: str) -> p
 
 def get_per_codon_ntNum_mutational_freq(df_hash : dict, outdir : str) -> None:
     import matplotlib.pyplot as plt
-    
-    colors = {}
-    colors['mutant'] = "#CC79A7"
-    colors['wildtype'] = 'teal'
+
     
     for key, value in df_hash.items():
         mut_freqs = dict()
@@ -909,7 +906,7 @@ if __name__ == '__main__':
         sample_df = pandas.read_csv(samples, sep = '\t')
         sample_df = filter(df = sample_df, minQ = args.qual, minAlt = args.counts, codonRange = args.pos)
         df_hash[args.samplename.split(',')[index].strip()] = sample_df
-
+        print(df_hash)
         
     get_per_codon_ntNum_mutational_freq(df_hash = df_hash, outdir = args.outdir)
     get_per_codon_aaTypeChange_mutational_freq(df_hash = df_hash, outdir = args.outdir)
