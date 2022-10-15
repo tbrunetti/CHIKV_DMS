@@ -718,8 +718,10 @@ def get_aa_diversity(df_hash : dict, outdir : str, colors : dict) -> None:
         #axs.ticklabel_format(axis = 'y', style='scientific', scilimits=(0.0, 0.0))
         axs.set_ylim([0,22])
         axs.tick_params(axis='y', labelsize= 20)
-        axs.set_ylabel('total number of different amino acids represented')
-        axs.set_xlabel('codon position')
+        axs.tick_params(axis='x', labelsize= 20)
+
+        axs.set_ylabel('total number of different \n amino acids represented', fontsize = 20)
+        axs.set_xlabel('codon position', fontsize = 20)
         
     axs.legend(legend_order)
     combined_fig.savefig(os.path.join(outdir, 'amino_acid_diversity_at_each_codon_across_samples.png'), dpi=600, format = 'png')
