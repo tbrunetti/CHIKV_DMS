@@ -714,7 +714,7 @@ def get_aa_diversity(df_hash : dict, outdir : str, colors : dict) -> None:
 
         # single nucleotide changes frequency per codon
         axs.plot('CODON_POSITION', 'total amino acids', data = mut_freqs_df, color=colors[key], alpha=1,  linestyle='-' , linewidth=1)
-        axs.set_title('Total different amino acids represented', fontsize = 20)
+        axs.set_title('{}: max diversity is {}, mean diversity is {}'.format(key, max(mut_freqs.values()), float(sum(mut_freqs.values()))/float(len(mut_freqs.values()))), fontsize = 20)
         #axs.ticklabel_format(axis = 'y', style='scientific', scilimits=(0.0, 0.0))
         axs.set_ylim([0,22])
         axs.tick_params(axis='y', labelsize= 20)
