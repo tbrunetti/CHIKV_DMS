@@ -143,7 +143,7 @@ def get_per_codon_ntNum_mutational_freq(df_hash : dict, outdir : str) -> None:
         combined_fig.savefig(os.path.join(outdir, 'freq_of_nt_changes_per_codon_{}.png'.format(key)), dpi=600, format = 'png')
         
 
-def get_per_codon_aaTypeChange_mutational_freq(df_hash: dict, outdir : str) -> None:
+def get_per_codon_aaTypeChange_mutational_freq(df_hash: dict, colors: dict, outdir : str) -> None:
     import matplotlib.pyplot as plt
     import matplotlib.ticker as mtick
     from matplotlib.lines import Line2D
@@ -241,9 +241,9 @@ def get_per_codon_aaTypeChange_mutational_freq(df_hash: dict, outdir : str) -> N
     for colorPick, (combinedKey, combinedValue) in enumerate(combined_samples.items()):
         #plt.legend(title='Parameter where:')
         legend_labels.append(combinedKey)
-        colors = ['#CC79A7', 'teal']
+        #colors = ['#CC79A7', 'teal']
         # plot synonymous change codon frequency
-        axs[0].plot('CODON_POSITION', 'aa_type_change_synonymous_freq', data = combinedValue, color=colors[colorPick], alpha=1,  linestyle='-' , linewidth=1)
+        axs[0].plot('CODON_POSITION', 'aa_type_change_synonymous_freq', data = combinedValue, color=colors[combinedKey], alpha=1,  linestyle='-' , linewidth=1)
         axs[0].set_title('synonymous', fontsize = 12)
         axs[0].ticklabel_format(axis = 'y', style='scientific', scilimits=(0.0, 0.0))
         axs[0].set_ylim([0,0.065])
@@ -254,7 +254,7 @@ def get_per_codon_aaTypeChange_mutational_freq(df_hash: dict, outdir : str) -> N
         #axs[0, 0].yaxis.set_major_formatter(mtick.FormatStrFormatter('%.2e'))
             
         # plot nonsynonymous codon change freqeuncy
-        axs[1].plot('CODON_POSITION', 'aa_type_change_nonsynonymous_freq', data = combinedValue, color=colors[colorPick], alpha=1,  linestyle='-' , linewidth=1)
+        axs[1].plot('CODON_POSITION', 'aa_type_change_nonsynonymous_freq', data = combinedValue, color=colors[combinedKey], alpha=1,  linestyle='-' , linewidth=1)
         axs[1].set_title('nonsynonymous', fontsize = 12)
         axs[1].ticklabel_format(axis = 'y', style='scientific', scilimits=(0.0, 0.0))
         axs[1].set_ylim([0,0.065])
@@ -265,7 +265,7 @@ def get_per_codon_aaTypeChange_mutational_freq(df_hash: dict, outdir : str) -> N
 
             
         # plot stop codon frequency
-        axs[2].plot('CODON_POSITION', 'aa_type_change_stop_freq', data = combinedValue, color=colors[colorPick], alpha=1,  linestyle='-' , linewidth=1)
+        axs[2].plot('CODON_POSITION', 'aa_type_change_stop_freq', data = combinedValue, color=colors[combinedKey], alpha=1,  linestyle='-' , linewidth=1)
         axs[2].set_title('stop', fontsize = 12)
         axs[2].ticklabel_format(axis = 'y', style='scientific', scilimits=(0.0, 0.0))
         axs[2].set_ylim([0,0.065])
@@ -274,8 +274,9 @@ def get_per_codon_aaTypeChange_mutational_freq(df_hash: dict, outdir : str) -> N
         axs[2].yaxis.set_major_formatter(yScalarFormatter)
         axs[2].tick_params(axis='y', labelsize= 9)
     # add manual legend
-    axs[2].legend([Line2D([0], [0], color=colors[0], lw=4),
-                Line2D([0], [0], color=colors[1], lw=4)], legend_labels)
+    axs[2].legend([Line2D([0], [0], color=colors[legend_labels[0]], lw=4),
+                Line2D([0], [0], color=colors[legend_labels[1]], lw=4), 
+                Line2D([0], [0], color=colors[legend_labels[2]], lw=4)], legend_labels)
     combined_sample_fig.tight_layout()
     combined_sample_fig.savefig(os.path.join(outdir, 'freq_of_aa_changes_per_codon_lineplot_sample_overlay.png'), dpi=600, format = 'png')
 
@@ -911,7 +912,7 @@ if __name__ == '__main__':
         print(df_hash)
         
     get_per_codon_ntNum_mutational_freq(df_hash = df_hash, outdir = args.outdir)
-    get_per_codon_aaTypeChange_mutational_freq(df_hash = df_hash, outdir = args.outdir)
+    get_per_codon_aaTypeChange_mutational_freq(df_hash = df_hash, colors = colors, outdir = args.outdir)
     get_per_sample_aaTypeChange_mutational_freq_stackedBarPlot(df_hash = df_hash, outdir = args.outdir)
     get_per_sample_ntNum_mutational_freq_stackedBarPlot(df_hash = df_hash, nonsynOnly = args.nonSynOnly, outdir = args.outdir)
     get_per_codon_aa_mutational_information_logoplot(df_hash = df_hash, nonsynOnly = args.nonSynOnly, outdir = args.outdir)
