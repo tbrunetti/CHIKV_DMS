@@ -1,0 +1,8 @@
+region_name,start,end,color
+E3,1,64,blue
+N link,65,79,yellow
+A domain,80,198,red
+Arch 1,199,236,green
+B domain,237,295,orange
+Arch 2,296,332,purple
+C domain,333,405,brown
