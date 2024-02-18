@@ -135,7 +135,8 @@ def generate_logo_plot(matrix_input:pandas.DataFrame, sample_name:str, annotatio
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Generates logo plot for predefined input matrix")
+    parser = argparse.ArgumentParser(description="Generates logo plot for predefined input matrix",
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--input', type = str, required=True, help = "Path to input csv matrix containing data to plot")
     parser.add_argument('--sampleName', type = str, default = "sample_1", help = "string indicating the name to give to sample")
     parser.add_argument('--annotConfig', type = str, default = None, help = "Path to csv containing annotations.  Example file located in ref folder of github repo")
