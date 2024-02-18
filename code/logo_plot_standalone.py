@@ -6,21 +6,22 @@ import argparse
 def format_data()
     input is based on what Megan has provided but it needs a minimum of 3 columns (all others will be ignored)
         - POSITION: an integer of the codon position
+        - REF_AA: reference sequence amino acid for annotation, generally this is a single letter amino acid symbol
         - AA: amino acid to plot, generally this is a single letter amino acid symbol
         - MERGE_FRAC: float [0-1] that shows the height/frequency of the amino acid symbol to plot on the logoplot
     output is a pandas dataframe that is formatted for logomaker in input into def generate_logo_plot()
 '''
 
-def format_data(data_input:pandas.DataFrame) -> pandas.DataFrame:
+def format_data(data_input:pandas.DataFrame) -> list[pandas.DataFrame, pandas.DataFrame]:
      pandas_df = pandas.read_csv(data_input)
      info_df = pandas_df[['POSITION', 'AA', 'MERGE_FRAC']]
      info_pivot_matrix = info_df.pivot(index = "POSITION", columns = "AA", values = "MERGE_FRAC")
      info_pivot_matrix.fillna(0, inplace=True)
+     ref_seq_df = pandas_df[['POSITION', 'REF_AA']].drop_duplicates()
+     return [info_pivot_matrix, ref_seq_df]
 
-     return info_pivot_matrix
 
-
-def generate_logo_plot(matrix_input:pandas.DataFrame, sample_name:str) -> None:
+def generate_logo_plot(matrix_input:pandas.DataFrame, ref_seq:pandas.DataFrame, sample_name:str) -> None:
     import json
     import logomaker
     import matplotlib.pyplot as plt
@@ -53,7 +54,7 @@ def generate_logo_plot(matrix_input:pandas.DataFrame, sample_name:str) -> None:
     for key,value in annot_data.items():
         breakpoints[key] = range(value['start'], value['end'])
 
-    def match_annotation(position_start:int, position_end:int) -> None:
+    def match_annotation(position_start:int, position_end:int, min_label_len:int) -> None:
         annot_start = -1
         annot_end = -1
         for key,value in breakpoints.items():
@@ -65,7 +66,10 @@ def generate_logo_plot(matrix_input:pandas.DataFrame, sample_name:str) -> None:
         if annot_start == annot_end:
             print("same_{}_{}".format(position_start, position_end))
             ax.plot([position_start-1, position_end+1], [y+0.1, y+0.1], alpha= 0.5, color = annot_data[annot_start]['color'], linewidth = 10, solid_capstyle="butt")
-            ax.text(((position_start-1 +position_end+1)/2), 1.1 ,annot_data[annot_start]['region_name'],fontsize=10)         
+            if (position_end - position_start) >= min_label_len:
+              ax.text(((position_start-1 +position_end+1)/2), 1.1 ,annot_data[annot_start]['region_name'],fontsize=10)     
+
+
         else:
           for subannotations in enumerate(range(annot_start, annot_end + 1)):
               if subannotations[0] == 0: # meaning it is the left most annotatation
@@ -73,32 +77,36 @@ def generate_logo_plot(matrix_input:pandas.DataFrame, sample_name:str) -> None:
                   end = annot_data[annot_start]['end']
                   print('first_{}_{}'.format(begin, end))
                   ax.plot([begin-1, end+1], [y+0.1, y+0.1], alpha= 0.5, color = annot_data[annot_start]['color'], linewidth = 10, solid_capstyle="butt")
-                  ax.text(((begin-1 + end+1)/2), 1.1 ,annot_data[annot_start]['region_name'],fontsize=10)
+                  if (end - begin) >= min_label_len:
+                    ax.text(((begin-1 + end+1)/2), 1.1 ,annot_data[annot_start]['region_name'],fontsize=10)
               elif subannotations[0] == len(range(annot_start, annot_end)):
                   print("here is the final loop")
                   begin = annot_data[annot_end]['start']
                   end = min(annot_data[annot_end]['end'], position_end)
                   print('last_{}_{}'.format(begin, end))
                   ax.plot([begin, end+1], [y+0.1, y+0.1], alpha= 0.5, color = annot_data[annot_end]['color'], linewidth = 10, solid_capstyle="butt")
-                  ax.text(((begin + end+1)/2), 1.1 ,annot_data[annot_end]['region_name'],fontsize=10)
+                  if (end - begin) >= min_label_len:
+                    ax.text(((begin + end+1)/2), 1.1 ,annot_data[annot_end]['region_name'],fontsize=10)
               else:
                   begin = annot_data[subannotations[1]]['start']
                   end = annot_data[subannotations[1]]['end']
                   print('middle_{}_{}'.format(begin, end))
                   ax.plot([begin, end+1], [y+0.1, y+0.1], alpha= 0.5, color = annot_data[subannotations[1]]['color'], linewidth = 10, solid_capstyle="butt")
-                  ax.text(((begin + end+1)/2), 1.1 ,annot_data[subannotations[1]]['region_name'],fontsize=10)                  
+                  if (end - begin) >= min_label_len:
+                    ax.text(((begin + end+1)/2), 1.1 ,annot_data[subannotations[1]]['region_name'],fontsize=10)                  
                
 
     # Counts matrix -> Information matrix
     height_per_row = 2
-    width_per_col = 7
+    width_per_col = 15
     start=9
-    end=50
+    end=74
     y = 1.05
     increment=end-start
     endPos=max(matrix_input.index)
     num_pos=endPos-start+1
     num_rows = math.ceil(num_pos/increment)
+    min_label_len = 7
 
     fig = plt.figure(figsize=[width_per_col * 1, height_per_row * num_rows])
     #fig.suptitle('All mutations for {} library \n'.format(sample_name), fontsize=15)
@@ -110,7 +118,7 @@ def generate_logo_plot(matrix_input:pandas.DataFrame, sample_name:str) -> None:
           # TODO also check when the last row is plotted since we may have to scale width differently
           tmp=matrix_input.loc[start:end]
           ax = plt.subplot2grid((num_rows, 1), (i, 0))
-          logomaker.Logo(tmp, ax=ax, color_scheme="skylign_protein", show_spines=True)
+          logomaker.Logo(tmp, ax=ax, color_scheme="skylign_protein", show_spines=True, stack_order = "fixed")
      
           ax.set_ylim([0,1.5]) # make sure all axises are the same; be careful to not truncate to early though; 4 bits can represent 16 values
           ax.set_yticks([0, 1])
@@ -124,7 +132,7 @@ def generate_logo_plot(matrix_input:pandas.DataFrame, sample_name:str) -> None:
           ax.xaxis.set_major_locator(mtick.MaxNLocator(integer=True)) 
 
           print('loopLoc_{}_start_{}_end_{}'.format(i, start, end))
-          match_annotation(position_start=start, position_end=end)
+          match_annotation(position_start=start, position_end=end, min_label_len= min_label_len)
 
           start=end+1
           if (end+increment) > max(matrix_input.index):
@@ -140,7 +148,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Generates logo plot for predefined input matrix")
     parser.add_argument('--input', type = str, required=True, help = "Path to input csv matrix containing data to plot")
     parser.add_argument('--sampleName', type = str, default = "sample_1", help = "string indicating the name to give to sample")
+    parser.add_argument('--addRefSeq', action="store_true", help = "adds reference seqeuence annotation to logo plot")
     args = parser.parse_args()
 
-    formatted_logo_matrix = format_data(data_input=args.input)
-    generate_logo_plot(matrix_input=formatted_logo_matrix, sample_name = args.sampleName)
+    formatted_dataframes  = format_data(data_input=args.input)
+    generate_logo_plot(matrix_input=formatted_dataframes[0], ref_seq = formatted_dataframes[1], sample_name = args.sampleName)
